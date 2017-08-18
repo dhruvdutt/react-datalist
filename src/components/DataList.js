@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import RadioList from './RadioList';
+import Checkbox from './Checkbox';
 
 const propTypes = {
   data: PropTypes.array.isRequired,
@@ -27,6 +28,7 @@ class DataList extends Component {
     }
 
     this.renderList = this.renderList.bind(this);
+    this.toggleCheckbox = this.toggleCheckbox.bind(this);
 
   }
 
@@ -34,6 +36,21 @@ class DataList extends Component {
     let dataObj = this.countOccurences(dataArr);
     console.log('countOccurences: ', dataObj);
     this.setState({ dataObj });
+  }
+
+  componentWillMount() {
+    this.selectedCheckboxes = new Set();
+  }
+
+  toggleCheckbox(label) {
+    let { selectedCheckboxes} = this;
+    if (selectedCheckboxes.has(label)) {
+      selectedCheckboxes.delete(label);
+    } else {
+      selectedCheckboxes.add(label);
+    }
+
+    console.log('toggleCheckbox: ', selectedCheckboxes);
   }
 
   countOccurences(dataArr) {
@@ -46,11 +63,16 @@ class DataList extends Component {
   renderList() {
     let { showCount, showRadio, defaultSelectedIndex, defaultSelected } = this.props;
     let { dataObj } = this.state;
+    let { toggleCheckbox } = this;
     let dataFieldSet = Object.keys(dataObj);
 
     return dataFieldSet.map(item => (
       <div key={item}>
         {(() => {
+          let label = item;
+
+          if (showCount) label += ` (${dataObj[label]})`;
+
           if (showRadio) return (
             <input
               type="radio"
@@ -58,13 +80,13 @@ class DataList extends Component {
             />
           );
           return (
-            <input
-              type="checkbox"
-              name="field1"
+            <Checkbox
+              item={item}
+              label={label}
+              onChange={toggleCheckbox}
             />
           );
         })()}
-        <label>{item} ({dataObj[item]})</label>
       </div>
     ));
   }

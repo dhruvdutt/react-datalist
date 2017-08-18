@@ -1,88 +1,55 @@
-import React from 'react';
-import './App.css';
+import React, { Component } from 'react';
+import DataList from './components/DataList';
 
-// DataList.js
-class DataList extends React.Component {
-	constructor(props) {
-  	super(props);
-    this.state = {
-    	dataSet: []
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-  	let { data } = nextProps;
-
-    let dataSet = this.pluckFieldList(data);
-    console.log('dataSet: ', dataSet);
-  	this.setState({ dataSet });
-  }
-
-  pluckFieldList(list) {
-
-    return list.reduce((obj, item) => {
-    	if (item in obj) {
-      	obj[item]++;
-      } else {
-      	obj[item] = 1;
-      }
-      return obj;
-    }, {});
-
-  }
-
-  render() {
-  	console.log("List render: ", this.state);
-    let { dataSet } = this.state;
-    let keyArr = Object.keys(dataSet);
-  	return (
-    	<div>
-      	{keyArr.map(item => {
-        	return (
-          	<div key={item}>
-            	<input key={item} type="radio" name="selectedColor" value={item} />
-              <label style={{textTransform: 'capitalize'}}>{item} ({dataSet[item]})</label>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-}
-
-class App extends React.Component {
+class App extends Component {
 
   constructor(props) {
   	super(props);
     this.state = {
-    	data: [],
-      eyeColorsData: []
+      loading: true,
+    	data: []
     };
-
   }
 
   componentDidMount() {
-  	fetch('https://api.myjson.com/bins/17mcd1')
-    	.then(response => {
-      	return response.json()
-      })
-      .then(data => {
-        console.log('Data fetched: ', data);
-        let eyeColorsData = data.map(item => item.eyeColor);
-        this.setState({ data, eyeColorsData });
 
+    fetch('https://api.myjson.com/bins/17mcd1')
+    	.then(response => response.json())
+      .then(allData => {
+        this.setState({ loading: false });
+
+        let eyeColorsData = this.pluckFieldData(allData, "eyeColor");
+
+        this.setState({ data: eyeColorsData });
       })
       .catch(err => {
-      	console.log(err);
+      	console.log('API error: ', err);
       });
   }
 
+
+  pluckFieldData(allData, field) {
+    return allData.map(item => item[field]);
+  }
+
   render() {
-  	let { eyeColorsData } = this.state;
+    let { loading, data } = this.state;
+
+    if (loading) {
+      return (
+        <div>Loading...</div>
+      )
+    }
+
     return (
-    	<div>
-      	<DataList
-        	data={eyeColorsData} />
+      <div>
+        <DataList
+          data={data}
+          showCount={true}
+          showRadio={false}
+          defaultSelected="brown"
+          defaultSelectedIndex={0}
+        />
       </div>
     );
   }

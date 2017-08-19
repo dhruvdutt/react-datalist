@@ -136,6 +136,7 @@ class App extends Component {
       <div className="container">
         <span className="controls">Search: </span>
         <input
+          className="form-control input-search"
           type="text"
           value={searchQuery}
           onChange={searchData}/>

@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
 import DataList from './components/DataList';
 
-const defaultSelectedRadio = "green";
-const defaultSelectedCheckboxes = ["green", "blue"];
-const SHOW_RADIO = true;
+const API_URL = 'https://api.myjson.com/bins/17mcd1';
+const FIELD = 'eyeColor';
+const DEFAULT_SELECTED_RADIO = "green";
+const DEFAULT_SELECTED_CHECKBOX = ["green", "blue"];
+const SHOW_RADIO = false;
 
 class App extends Component {
 
   constructor(props) {
-  	super(props);
+    super(props);
     this.state = {
       loading: true,
-    	data: [],
+      data: [],
       showRadio: SHOW_RADIO,
-      defaultSelectedItems: SHOW_RADIO ? defaultSelectedRadio : defaultSelectedCheckboxes,
+      defaultSelectedItems: SHOW_RADIO ? DEFAULT_SELECTED_RADIO : DEFAULT_SELECTED_CHECKBOX,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -22,36 +24,11 @@ class App extends Component {
     this.toggleType = this.toggleType.bind(this);
   }
 
-  componentWillUpdate(nextProps, { showRadio }) {
-    if (showRadio !== this.state.showRadio) {
-      let defaultSelectedItems = showRadio ? defaultSelectedRadio : defaultSelectedCheckboxes;
-      this.setState({ defaultSelectedItems });
-    }
-  }
-
-  componentDidMount() {
-
-    fetch('https://api.myjson.com/bins/17mcd1')
-    	.then(response => response.json())
-      .then(allData => {
-        this.setState({ loading: false });
-
-        let eyeColorsData = this.pluckFieldData(allData, "eyeColor");
-
-        this.setState({
-          data: eyeColorsData
-        });
-      })
-      .catch(err => {
-      	console.log('API error: ', err);
-      });
-  }
-
-
-  pluckFieldData(allData, field) {
-    return allData.map(item => item[field]);
-  }
-
+  /*
+  * Toggle type of list [checkbox / radio]
+  *
+  * @type     Testing
+  */
   toggleType() {
     this.setState(({ showRadio }) => {
       return {
@@ -60,18 +37,84 @@ class App extends Component {
     });
   }
 
+  /*
+  * componentWillUpdate
+  * Select defaultSelectedItems based on list type (eval showRadio)
+  *
+  * @type     React lifecycle
+  *
+  * @param    {Object}   nextProps   Next props object
+  * @param    {Object}   nextState   Next state object
+  */
+  componentWillUpdate(nextProps, { showRadio }) {
+    if (showRadio !== this.state.showRadio) {
+      let defaultSelectedItems = showRadio ? DEFAULT_SELECTED_RADIO : DEFAULT_SELECTED_CHECKBOX;
+      this.setState({ defaultSelectedItems });
+    }
+  }
+
+  /*
+  * componentDidMount
+  * Fetch data from API_URL, pluckFieldData
+  *
+  * @type     React lifecycle
+  *
+  * @param    {Object}   nextProps   Next props object
+  * @param    {Object}   nextState   Next state object
+  */
+  componentDidMount() {
+
+    fetch(API_URL)
+    .then(response => response.json())
+    .then(allData => {
+      this.setState({ loading: false });
+
+      let data = this.pluckFieldData(allData, FIELD);
+
+      this.setState({ data });
+    })
+    .catch(err => {
+      console.log('API error: ', err);
+    });
+  }
+
+  /*
+  * Pluck array of field from data
+  *
+  * @param    {Array}   allData     Array of data object
+  * @param    {String}  field       Name of the field to be plucked
+  *
+  * @returns  {Array}   Array of field passed
+  */
+  pluckFieldData(allData, field) {
+    return allData.map(item => item[field]);
+  }
+
+  /*
+  * onChange handler that shows previous items, selected items
+  *
+  * @param    {Array|String}   prevItems     Array|String of previous item/s
+  * @param    {Array|String}   items         Array|String of selected item/s
+  */
   onChange(prevItems, items) {
     console.log('onChange - prevItems: ', prevItems, 'items: ', items);
   }
 
+  /*
+  * Render loading template
+  */
+  renderLoader() {
+    return (
+      <div>Loading...</div>
+    )
+  }
+
   render() {
     let { loading, data, showRadio, defaultSelectedItems } = this.state;
-    let { toggleType, onChange } = this;
+    let { toggleType, onChange, renderLoader } = this;
 
     if (loading) {
-      return (
-        <div>Loading...</div>
-      )
+      return renderLoader()
     }
 
     return (

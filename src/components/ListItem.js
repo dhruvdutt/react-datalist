@@ -26,13 +26,11 @@ class ListItem extends Component {
     this.toggleListItem = this.toggleListItem.bind(this);
   }
 
+  /*
+  * Toggle list item
+  */
   toggleListItem() {
     let { onChange, item } = this.props;
-
-    // this.setState(({ isChecked }) => ({
-    //   isChecked: !isChecked
-    // }));
-
     onChange(item);
   }
 
@@ -49,7 +47,6 @@ class ListItem extends Component {
             checked={isChecked}
             onChange={this.toggleListItem}
           />
-
           {label}
         </label>
       </div>

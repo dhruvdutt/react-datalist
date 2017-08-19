@@ -104,6 +104,11 @@ class App extends Component {
     console.log('onChange - prevItems: ', prevItems, 'items: ', items);
   }
 
+  /*
+  * Filter data based on searchQuery
+  *
+  * @param    {Object}   event     React SyntheticEvent object
+  */
   searchData(event) {
     let { value: searchQuery } = event.target;
     this.setState({ searchQuery });

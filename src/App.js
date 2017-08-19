@@ -6,6 +6,7 @@ const FIELD = 'eyeColor';
 const DEFAULT_SELECTED_RADIO = "green";
 const DEFAULT_SELECTED_CHECKBOX = ["green", "blue"];
 const SHOW_RADIO = false;
+let DATA = [];
 
 class App extends Component {
 
@@ -13,12 +14,14 @@ class App extends Component {
     super(props);
     this.state = {
       loading: true,
-      data: [],
+      filteredData: [],
       showRadio: SHOW_RADIO,
+      searchQuery: '',
       defaultSelectedItems: SHOW_RADIO ? DEFAULT_SELECTED_RADIO : DEFAULT_SELECTED_CHECKBOX,
     };
 
     this.onChange = this.onChange.bind(this);
+    this.searchData = this.searchData.bind(this);
 
     // for testing
     this.toggleType = this.toggleType.bind(this);
@@ -69,9 +72,10 @@ class App extends Component {
     .then(allData => {
       this.setState({ loading: false });
 
-      let data = this.pluckFieldData(allData, FIELD);
+      let filteredData = this.pluckFieldData(allData, FIELD);
+      DATA = [...filteredData];
 
-      this.setState({ data });
+      this.setState({ filteredData });
     })
     .catch(err => {
       console.log('API error: ', err);
@@ -100,6 +104,17 @@ class App extends Component {
     console.log('onChange - prevItems: ', prevItems, 'items: ', items);
   }
 
+  searchData(event) {
+    let { value: searchQuery } = event.target;
+    this.setState({ searchQuery });
+
+    let filteredData = DATA.filter(item => {
+      return item.toLowerCase().search(searchQuery.toLowerCase()) !== -1;
+    })
+
+    this.setState({ filteredData });
+  }
+
   /*
   * Render loading template
   */
@@ -110,19 +125,30 @@ class App extends Component {
   }
 
   render() {
-    let { loading, data, showRadio, defaultSelectedItems } = this.state;
-    let { toggleType, onChange, renderLoader } = this;
+    let { loading, filteredData, showRadio, defaultSelectedItems, searchQuery } = this.state;
+    let { toggleType, onChange, renderLoader, searchData } = this;
 
     if (loading) {
       return renderLoader()
     }
 
     return (
-      <div>
-        <button onClick={toggleType}>Toggle Type</button>
+      <div className="container">
+        <span className="controls">Search: </span>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={searchData}/>
+        <button
+          onClick={toggleType}
+          value="toggle"
+          className="btn btn-primary">
+          Toggle type
+        </button>
+        <hr/>
         <DataList
           onChange={onChange}
-          data={data}
+          data={filteredData}
           showCount={true}
           showRadio={showRadio}
           defaultSelected={defaultSelectedItems}

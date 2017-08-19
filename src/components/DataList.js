@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ListItem from './ListItem';
 
+import './DataList.css';
+
 const DEFAULT_DATA_LIST_TYPE = "radio";
 const DEFAULT_DATA_LIST_NAME = "fieldName";
 
@@ -202,7 +204,7 @@ class DataList extends Component {
     }
 
     return dataFieldSet.map(item => (
-      <div key={item}>
+      <div key={item} className="form-group">
         {(() => {
 
           let { type, label, isChecked, onChangeHandler } = propsEval(item);
@@ -228,8 +230,10 @@ class DataList extends Component {
 
     return (
       <div>
-        <h3>DataList</h3>
-        { renderList(dataObj) }
+        <h4 className="list-header">DataList</h4>
+        <ul className="list-container">
+          { renderList(dataObj) }
+        </ul>
       </div>
     )
   }

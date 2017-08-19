@@ -35,17 +35,20 @@ class ListItem extends Component {
   }
 
   render() {
-    let { type, name, label, item, isChecked } = this.props;
+    let { type, name, label, item, isChecked } = this.props
+    let classLabel = "label--" + type;
+    let classInput = "input-" + type;
 
     return (
-      <div className="checkbox">
-        <label>
+      <div className={type}>
+        <label className={classLabel}>
           <input
             type={type}
             name={name}
             value={item}
             checked={isChecked}
             onChange={this.toggleListItem}
+            className={classInput}
           />
           {label}
         </label>

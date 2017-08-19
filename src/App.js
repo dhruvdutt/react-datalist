@@ -7,8 +7,15 @@ class App extends Component {
   	super(props);
     this.state = {
       loading: true,
-    	data: []
+    	data: [],
+      showRadio: false,
+      defaultSelectedItems: [],
     };
+
+    this.onChange = this.onChange.bind(this);
+
+    // for testing
+    this.toggleType = this.toggleType.bind(this);
   }
 
   componentDidMount() {
@@ -20,7 +27,15 @@ class App extends Component {
 
         let eyeColorsData = this.pluckFieldData(allData, "eyeColor");
 
-        this.setState({ data: eyeColorsData });
+        let defaultSelectedItems = [
+          "brown",
+          "green",
+        ];
+
+        this.setState({
+          data: eyeColorsData,
+          defaultSelectedItems,
+        });
       })
       .catch(err => {
       	console.log('API error: ', err);
@@ -32,8 +47,23 @@ class App extends Component {
     return allData.map(item => item[field]);
   }
 
+  toggleType() {
+    this.setState(({ showRadio }) => {
+      return {
+        showRadio: !showRadio,
+      }
+    });
+  }
+
+  onChange(prevItems, items) {
+    console.log('onChange - prevItems: ', prevItems, 'items: ', items);
+  }
+
   render() {
-    let { loading, data } = this.state;
+    let { loading, data, showRadio, defaultSelectedItems } = this.state;
+    let { toggleType, onChange } = this;
+
+    console.log('defaultSelectedItems: ', defaultSelectedItems);
 
     if (loading) {
       return (
@@ -43,12 +73,13 @@ class App extends Component {
 
     return (
       <div>
+        <button onClick={toggleType}>Toggle Type</button>
         <DataList
+          onChange={onChange}
           data={data}
           showCount={true}
-          showRadio={false}
-          defaultSelected="brown"
-          defaultSelectedIndex={0}
+          showRadio={showRadio}
+          defaultSelected={defaultSelectedItems}
         />
       </div>
     );

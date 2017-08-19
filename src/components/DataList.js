@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import RadioList from './RadioList';
+import Radio from './Radio';
 import Checkbox from './Checkbox';
 
 const propTypes = {
   data: PropTypes.array.isRequired,
   showCount: PropTypes.bool,
   showRadio: PropTypes.bool,
-  defaultSelectedIndex: PropTypes.number,
-  defaultSelected: PropTypes.string,
+  defaultSelected: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.array,
+  ]),
+  onChange: PropTypes.func,
 }
 
 const defaultProps = {
@@ -16,6 +19,7 @@ const defaultProps = {
   showRadio: true,
   defaultSelectedIndex: -1,
   defaultSelected: '',
+  selectedItems: '',
 }
 
 class DataList extends Component {
@@ -25,32 +29,70 @@ class DataList extends Component {
 
     this.state = {
       dataObj: {},
+      selectedItems: props.defaultSelected,
     }
 
     this.renderList = this.renderList.bind(this);
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
+    this.toggleRadio = this.toggleRadio.bind(this);
 
   }
 
-  componentWillReceiveProps({ data: dataArr }) {
+  componentWillReceiveProps({ data: dataArr, showRadio, defaultSelected }) {
     let dataObj = this.countOccurences(dataArr);
-    console.log('countOccurences: ', dataObj);
+
     this.setState({ dataObj });
-  }
 
-  componentWillMount() {
-    this.selectedCheckboxes = new Set();
-  }
-
-  toggleCheckbox(label) {
-    let { selectedCheckboxes} = this;
-    if (selectedCheckboxes.has(label)) {
-      selectedCheckboxes.delete(label);
-    } else {
-      selectedCheckboxes.add(label);
+    if (!showRadio) {
+      this.setState({ selectedItems: new Set()})
     }
 
-    console.log('toggleCheckbox: ', selectedCheckboxes);
+    if (!!defaultSelected) {
+      console.log('defaultSelected:', defaultSelected);
+      let selectedItems = typeof defaultSelected === 'string' ? defaultSelected : new Set(defaultSelected);
+      this.setState({ selectedItems });
+    }
+
+  }
+
+  // componentWillMount() {
+  //   this.selectedItems = new Set();
+  // }
+
+  selectItem() {
+
+  }
+
+  toggleCheckbox(item) {
+    let { onChange } = this.props;
+
+    let { selectedItems } = this.state;
+
+    let prevselectedItems = new Set(selectedItems);
+
+    if (selectedItems.has(item)) {
+      selectedItems.delete(item);
+    } else {
+      selectedItems.add(item);
+    }
+
+    this.setState({ selectedItems});
+
+    onChange(prevselectedItems, selectedItems);
+  }
+
+  toggleRadio(item) {
+    let { onChange } = this.props;
+
+    let { selectedItems } = this.state;
+
+    let prevselectedItems = typeof selectedItems !== 'string' ? null : selectedItems;
+
+    selectedItems = item;
+
+    this.setState({ selectedItems });
+
+    onChange(prevselectedItems, selectedItems);
   }
 
   countOccurences(dataArr) {
@@ -62,30 +104,44 @@ class DataList extends Component {
 
   renderList() {
     let { showCount, showRadio, defaultSelectedIndex, defaultSelected } = this.props;
-    let { dataObj } = this.state;
-    let { toggleCheckbox } = this;
+    let { dataObj, selectedItems } = this.state;
+    let { toggleCheckbox, toggleRadio } = this;
     let dataFieldSet = Object.keys(dataObj);
+
+    console.log('selectedItems: ', selectedItems);
 
     return dataFieldSet.map(item => (
       <div key={item}>
         {(() => {
-          let label = item;
+          let label = item,
+              isChecked = false;
+
 
           if (showCount) label += ` (${dataObj[label]})`;
 
-          if (showRadio) return (
-            <input
-              type="radio"
-              name="field1"
-            />
-          );
-          return (
-            <Checkbox
-              item={item}
-              label={label}
-              onChange={toggleCheckbox}
-            />
-          );
+          if (showRadio) {
+            isChecked = selectedItems === item;
+            return (
+              <Radio
+                name="eyeColor"
+                item={item}
+                label={label}
+                isChecked={isChecked}
+                onChange={toggleRadio}
+              />
+            )
+          } else {
+            isChecked = selectedItems.has(item);
+            return (
+              <Checkbox
+                name="eyeColor"
+                item={item}
+                label={label}
+                isChecked={isChecked}
+                onChange={toggleCheckbox}
+              />
+            )
+          }
         })()}
       </div>
     ));

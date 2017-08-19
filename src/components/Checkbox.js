@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 const propTypes = {
+  name: PropTypes.string.isRequired,
   item: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   isChecked: PropTypes.bool,
@@ -18,7 +19,7 @@ class Checkbox extends Component {
     super(props);
 
     this.state = {
-      isChecked: props.isChecked ? props.isChecked : false,
+      isChecked: props.isChecked,
     }
 
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
@@ -27,21 +28,21 @@ class Checkbox extends Component {
   toggleCheckbox() {
     let { onChange, item } = this.props;
 
-    this.setState(({ isChecked }) => ({
-      isChecked: !isChecked
-    }));
+    // this.setState(({ isChecked }) => ({
+    //   isChecked: !isChecked
+    // }));
 
     onChange(item);
   }
 
   render() {
-    let { label, item } = this.props;
-    let { isChecked } = this.state;
-
+    let { name, label, item, isChecked } = this.props;
+    
     return (
       <div className="checkbox">
         <label>
           <input
+            name={name}
             type="checkbox"
             value={item}
             checked={isChecked}

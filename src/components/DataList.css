@@ -1,0 +1,30 @@
+.container {
+  padding-top: 3rem;
+}
+
+.controls {
+  font-size: 1.5rem;
+  padding-right: 1rem;
+}
+
+.btn {
+  text-transform: capitalize !important;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.list-header {
+  padding-bottom: 1.5rem;
+  padding-left: 1.4rem;
+}
+
+.input-checkbox, .input-radio {
+  top: 0;
+  position: absolute;
+  padding-right: 0.5rem !important;
+}
+
+.label--checkbox, .label--radio {
+  text-transform: capitalize;
+  padding: 0 !important;
+}

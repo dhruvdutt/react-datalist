@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 const propTypes = {
+  type: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   item: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
@@ -13,7 +14,7 @@ const defaultProps = {
   isChecked: false,
 }
 
-class Checkbox extends Component {
+class ListItem extends Component {
 
   constructor(props) {
     super(props);
@@ -22,10 +23,10 @@ class Checkbox extends Component {
       isChecked: props.isChecked,
     }
 
-    this.toggleCheckbox = this.toggleCheckbox.bind(this);
+    this.toggleListItem = this.toggleListItem.bind(this);
   }
 
-  toggleCheckbox() {
+  toggleListItem() {
     let { onChange, item } = this.props;
 
     // this.setState(({ isChecked }) => ({
@@ -36,17 +37,17 @@ class Checkbox extends Component {
   }
 
   render() {
-    let { name, label, item, isChecked } = this.props;
-    
+    let { type, name, label, item, isChecked } = this.props;
+
     return (
       <div className="checkbox">
         <label>
           <input
+            type={type}
             name={name}
-            type="checkbox"
             value={item}
             checked={isChecked}
-            onChange={this.toggleCheckbox}
+            onChange={this.toggleListItem}
           />
 
           {label}
@@ -56,7 +57,7 @@ class Checkbox extends Component {
   }
 }
 
-Checkbox.propTypes = propTypes;
-Checkbox.defaultProps = defaultProps;
+ListItem.propTypes = propTypes;
+ListItem.defaultProps = defaultProps;
 
-export default Checkbox;
+export default ListItem;

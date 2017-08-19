@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import DataList from './components/DataList';
 
+const defaultSelectedRadio = "green";
+const defaultSelectedCheckboxes = ["green", "blue"];
+const SHOW_RADIO = true;
+
 class App extends Component {
 
   constructor(props) {
@@ -8,14 +12,21 @@ class App extends Component {
     this.state = {
       loading: true,
     	data: [],
-      showRadio: false,
-      defaultSelectedItems: [],
+      showRadio: SHOW_RADIO,
+      defaultSelectedItems: SHOW_RADIO ? defaultSelectedRadio : defaultSelectedCheckboxes,
     };
 
     this.onChange = this.onChange.bind(this);
 
     // for testing
     this.toggleType = this.toggleType.bind(this);
+  }
+
+  componentWillUpdate(nextProps, { showRadio }) {
+    if (showRadio !== this.state.showRadio) {
+      let defaultSelectedItems = showRadio ? defaultSelectedRadio : defaultSelectedCheckboxes;
+      this.setState({ defaultSelectedItems });
+    }
   }
 
   componentDidMount() {
@@ -27,14 +38,8 @@ class App extends Component {
 
         let eyeColorsData = this.pluckFieldData(allData, "eyeColor");
 
-        let defaultSelectedItems = [
-          "brown",
-          "green",
-        ];
-
         this.setState({
-          data: eyeColorsData,
-          defaultSelectedItems,
+          data: eyeColorsData
         });
       })
       .catch(err => {
@@ -62,8 +67,6 @@ class App extends Component {
   render() {
     let { loading, data, showRadio, defaultSelectedItems } = this.state;
     let { toggleType, onChange } = this;
-
-    console.log('defaultSelectedItems: ', defaultSelectedItems);
 
     if (loading) {
       return (

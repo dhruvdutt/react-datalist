@@ -43,8 +43,10 @@ class DataList extends Component {
     if (!!defaultSelected) selectedItems = defaultSelected;
 
     this.state = {
+      dataArr: props.data,
       dataObj: {},
       selectedItems,
+      searchQuery: '',
     }
 
     this.setDefaultSelectedItems = this.setDefaultSelectedItems.bind(this);
@@ -52,6 +54,7 @@ class DataList extends Component {
     this.renderList = this.renderList.bind(this);
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
     this.toggleRadio = this.toggleRadio.bind(this);
+    this.searchData = this.searchData.bind(this);
   }
 
   /*
@@ -100,9 +103,14 @@ class DataList extends Component {
   */
   componentWillReceiveProps(nextProps) {
 
+    let { data: dataArr } = nextProps;
+
     // object with key:item and value:occurence
-    let dataObj = this.countOccurences(nextProps.data);
-    this.setState({ dataObj });
+    let dataObj = this.countOccurences(dataArr);
+    this.setState({
+      dataObj,
+      dataArr,
+    });
 
     this.setDefaultSelectedItems(nextProps);
   }
@@ -224,13 +232,42 @@ class DataList extends Component {
     ));
   }
 
+  /*
+  * Filter data based on searchQuery
+  *
+  * @param    {Object}   event     React SyntheticEvent object
+  */
+  searchData(event) {
+    let { dataArr } = this.state;
+    let { value: searchQuery } = event.target;
+    this.setState({ searchQuery });
+
+    let filteredDataArr = dataArr.filter(item => {
+      return item.toLowerCase().search(searchQuery.toLowerCase()) !== -1;
+    });
+
+    let dataObj = this.countOccurences(filteredDataArr);
+    this.setState({
+      dataObj,
+    });
+
+  }
+
   render() {
-    let { dataObj } = this.state;
-    let { renderList } = this;
+    let { dataObj, searchQuery } = this.state;
+    let { renderList, searchData } = this;
 
     return (
       <div>
         <h4 className="list-header">DataList</h4>
+        <div className="input-search-container">
+          <input
+            className="form-control input-search"
+            type="text"
+            value={searchQuery}
+            placeholder="Search items"
+            onChange={searchData}/>
+        </div>
         <ul className="list-container">
           { renderList(dataObj) }
         </ul>

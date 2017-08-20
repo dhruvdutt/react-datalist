@@ -6,7 +6,6 @@ const FIELD = 'eyeColor';
 const DEFAULT_SELECTED_RADIO = "green";
 const DEFAULT_SELECTED_CHECKBOX = ["green", "blue"];
 const SHOW_RADIO = false;
-let DATA = [];
 
 class App extends Component {
 
@@ -14,14 +13,12 @@ class App extends Component {
     super(props);
     this.state = {
       loading: true,
-      filteredData: [],
+      dataArr: [],
       showRadio: SHOW_RADIO,
-      searchQuery: '',
       defaultSelectedItems: SHOW_RADIO ? DEFAULT_SELECTED_RADIO : DEFAULT_SELECTED_CHECKBOX,
     };
 
     this.onChange = this.onChange.bind(this);
-    this.searchData = this.searchData.bind(this);
 
     // for testing
     this.toggleType = this.toggleType.bind(this);
@@ -72,10 +69,9 @@ class App extends Component {
     .then(allData => {
       this.setState({ loading: false });
 
-      let filteredData = this.pluckFieldData(allData, FIELD);
-      DATA = [...filteredData];
+      let dataArr = this.pluckFieldData(allData, FIELD);
 
-      this.setState({ filteredData });
+      this.setState({ dataArr });
     })
     .catch(err => {
       console.log('API error: ', err);
@@ -105,22 +101,6 @@ class App extends Component {
   }
 
   /*
-  * Filter data based on searchQuery
-  *
-  * @param    {Object}   event     React SyntheticEvent object
-  */
-  searchData(event) {
-    let { value: searchQuery } = event.target;
-    this.setState({ searchQuery });
-
-    let filteredData = DATA.filter(item => {
-      return item.toLowerCase().search(searchQuery.toLowerCase()) !== -1;
-    })
-
-    this.setState({ filteredData });
-  }
-
-  /*
   * Render loading template
   */
   renderLoader() {
@@ -130,8 +110,8 @@ class App extends Component {
   }
 
   render() {
-    let { loading, filteredData, showRadio, defaultSelectedItems, searchQuery } = this.state;
-    let { toggleType, onChange, renderLoader, searchData } = this;
+    let { loading, dataArr, showRadio, defaultSelectedItems } = this.state;
+    let { toggleType, onChange, renderLoader } = this;
 
     if (loading) {
       return renderLoader()
@@ -139,22 +119,17 @@ class App extends Component {
 
     return (
       <div className="container">
-        <span className="controls">Search: </span>
-        <input
-          className="form-control input-search"
-          type="text"
-          value={searchQuery}
-          onChange={searchData}/>
+        <span className="controls">Toggles: </span>
         <button
           onClick={toggleType}
           value="toggle"
           className="btn btn-primary">
-          Toggle type
+          Type
         </button>
         <hr/>
         <DataList
           onChange={onChange}
-          data={filteredData}
+          data={dataArr}
           showCount={true}
           showRadio={showRadio}
           defaultSelected={defaultSelectedItems}
